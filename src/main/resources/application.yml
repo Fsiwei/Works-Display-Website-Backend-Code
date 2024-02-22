@@ -1,0 +1,52 @@
+#
+##下面这些内容是为了让MyBatis映射
+##指定Mybatis的Mapper文件
+#mybatis.mapper-locations=classpath:mappers/*xml
+##指定Mybatis的实体目录
+#mybatis.type-aliases-package=com.example.springboot.mybatis.entity
+#
+## 应用服务 WEB 访问端口
+#server.port=8080
+
+## 热部署
+#spring:devtools.restart.enabled=true
+#spring.devtools.restart.additional-paths=src/main/java
+#spring:
+#  application:
+#    name: springboot
+#  profiles:
+#    active: dev
+#    #热部署
+#  devtools:
+#    #不重启项目
+#    restart:
+#      enabled: false
+#    #开启热加载
+#    livereload:
+#      enabled: true
+
+
+# 应用服务 WEB 访问端口
+server:
+  port: 5000
+
+# 配置数据库
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/db_display_website?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8
+    username: root
+    password: root
+
+#  application:
+#    name: springboot
+#  profiles:
+#    active: dev
+#  #热部署
+#  devtools:
+#    #不重启项目
+#    restart:
+#      enabled: false
+#    #开启热加载
+#    livereload:
+#      enabled: true
