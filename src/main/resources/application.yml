@@ -30,13 +30,39 @@
 server:
   port: 5000
 
+#下面这些内容是为了让MyBatis映射
+mybatis:
+  # 指定Mybatis的Mapper文件
+  mapper-locations: classpath:mappers/*xml
+  # 指定Mybatis的实体目录
+  type-aliases-package: com.example.springboot.mybatis.entity
+
+logging:
+  level:
+    org:
+      springframework=DEBUG:
+
 # 配置数据库
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3307/db_display_website?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8
+    url: jdbc:mysql://${ip}:3307/db_display_website?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8
     username: root
     password: root
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  devtools:
+    restart:
+      enabled: true
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+
+ip: localhost
 
 #  application:
 #    name: springboot
