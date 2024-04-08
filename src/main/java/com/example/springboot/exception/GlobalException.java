@@ -26,6 +26,6 @@ public class GlobalException {
 	@ResponseBody
 	public Result globalException(Exception e) {
 		e.printStackTrace();
-		return Result.error("500", "系统错误");
+		return Result.error("500", "系统错误，全局");
 	}
 }

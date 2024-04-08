@@ -3,9 +3,12 @@ package com.example.springboot.controller;
 import cn.hutool.core.io.FileUtil;
 import com.example.springboot.common.AuthAccess;
 import com.example.springboot.common.Result;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +24,8 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
+    
+    private static final Logger log = LoggerFactory.getLogger(FileController.class);
     
     @Value("${ip:localhost}") // 引入 application.yml 文件定义的参数，其中 localhost 是默认值，防止该参数时报错
     String ip;
@@ -56,18 +61,43 @@ public class FileController {
     }
     
     
-    @AuthAccess // 这个注释只在测试接口时使用
+    // @AuthAccess
+    // @GetMapping("/download/{fileName}")
+    // public void download(@PathVariable String fileName, HttpServletResponse response) throws IOException { // 定义返回值类型 void，是因为要以文件流的形式输出
+    //     String filePath = ROOT_PATH + File.separator + fileName;
+    //     if(!FileUtil.exist(filePath)){ // 判断请求下载文件是否存在
+    //         return; // 不存在直接返回
+    //     }
+    //     byte[] bytes = FileUtil.readBytes(filePath); // 文件存在，读取文件的字节流
+    //     ServletOutputStream outputStream = response.getOutputStream();
+    //     outputStream.write(bytes); // 将文件写入，该方法参数是一个字节数组，即文件的字节流
+    //     outputStream.flush(); // 刷新
+    //     outputStream.close(); // 关闭，不关闭会占内存资源
+    // }
+    
+    @AuthAccess
     @GetMapping("/download/{fileName}")
-    public void download(@PathVariable String fileName, HttpServletResponse response) throws IOException { // 定义返回值类型 void，是因为要以文件流的形式输出
-        String filePath = ROOT_PATH + File.separator + fileName;
-        if(!FileUtil.exist(filePath)){ // 判断请求下载文件是否存在
-            return; // 不存在直接返回
+    public void download(@PathVariable String fileName, HttpServletResponse response) {
+        try {
+            String filePath = ROOT_PATH + File.separator + fileName;
+            if(!FileUtil.exist(filePath)){ // 判断请求下载文件是否存在
+                return; // 不存在直接返回
+            }
+            byte[] bytes = FileUtil.readBytes(filePath); // 文件存在，读取文件的字节流
+            ServletOutputStream outputStream = response.getOutputStream();
+            outputStream.write(bytes); // 将文件写入，该方法参数是一个字节数组，即文件的字节流
+            outputStream.flush(); // 刷新
+            outputStream.close(); // 关闭，不关闭会占内存资源
+        } catch (ClientAbortException e) {
+            // 客户端中断连接，可以记录日志，但不需要进一步处理
+            log.info("Client aborted connection", e);
+        } catch (IOException e) {
+            // 其他IO异常处理
+            log.error("Error occurred while sending file to client", e);
+        } catch (Exception e) {
+            // 处理其他可能的异常
+            log.error("Unexpected error", e);
         }
-        byte[] bytes = FileUtil.readBytes(filePath); // 文件存在，读取文件的字节流
-        ServletOutputStream outputStream = response.getOutputStream();
-        outputStream.write(bytes); // 将文件写入，该方法参数是一个字节数组，即文件的字节流
-        outputStream.flush(); // 刷新
-        outputStream.close(); // 关闭，不关闭会占内存资源
     }
     
 }

@@ -1,6 +1,5 @@
 package com.example.springboot.entity;
 
-import cn.hutool.core.date.DateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +21,8 @@ import java.util.Date;
 public class Work {
 	private Integer workId;
 	private Integer userId;
+	private String username;
+	private String avatar;
 	private String workName;
 	private String workDescribe;
 	private String workType;

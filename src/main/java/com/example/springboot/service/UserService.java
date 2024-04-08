@@ -34,6 +34,14 @@ public class UserService {
 		userMapper.update(user);
 	}
 	
+	public void updateUserIsActive(Integer userId, Integer isActive) {
+		userMapper.updateUserIsActive(userId, isActive);
+	}
+	
+	public User selectByUserId(Integer userId) {
+		return userMapper.selectByUserId(userId);
+	}
+	
 	public void deleteUser(Integer id) {
 		userMapper.delete(id);
 	}
@@ -60,15 +68,25 @@ public class UserService {
 		return userMapper.selectByUsernameAndNameLike(username, name);
 	}
 	
-	public Page<User> selectByUsernameAndNamePage(Integer pageNum, Integer pageSize, String username, String name) {
+	public Page<User> selectAllUserPage(Integer pageNum, Integer pageSize) {
 		Integer skipNum = (pageNum - 1) * pageSize;
 		Page<User> page = new Page<>();
-		List<User> userList = userMapper.selectByUsernameAndNamePage(skipNum, pageSize, username, name);
-		Integer total = userMapper.selectCountPage(username, name);
+		List<User> userList = userMapper.selectAllUserPage(skipNum, pageSize);
+		Integer total = userMapper.selectCountPage();
 		page.setList(userList);
 		page.setTotal(total);
 		return page;
 	}
+	
+	// public Page<User> selectByUsernameAndNamePage(Integer pageNum, Integer pageSize, String username, String name) {
+	// 	Integer skipNum = (pageNum - 1) * pageSize;
+	// 	Page<User> page = new Page<>();
+	// 	List<User> userList = userMapper.selectByUsernameAndNamePage(skipNum, pageSize, username, name);
+	// 	int total = userMapper.selectCountPage(username, name);
+	// 	page.setList(userList);
+	// 	page.setTotal(total);
+	// 	return page;
+	// }
 	
 	// 验证数据是否合法
 	public User login(User user) {
