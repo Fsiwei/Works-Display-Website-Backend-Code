@@ -140,6 +140,7 @@ public class UserController {
 	public Result updateUserInfo(@RequestBody Map<String, Object> requestData) {
 		Integer userId = (Integer) requestData.get("userId");
 		String username = (String) requestData.get("username");
+		String gender = (String) requestData.get("gender");
 		String name = (String) requestData.get("name");
 		String phone = (String) requestData.get("phone");
 		String email = (String) requestData.get("email");
@@ -151,6 +152,7 @@ public class UserController {
 			User user = User.builder()
 					.id(userId)
 					.username(username)
+					.gender(gender)
 					.name(name)
 					.phone(phone)
 					.email(email)
@@ -197,7 +199,9 @@ public class UserController {
 	 * 多条件分页模糊查询
 	 */
 	@GetMapping("/selectAllUserPage")
-	public Result selectAllUserPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize) {
+	public Result selectAllUserPage(@RequestParam String pn, @RequestParam String ps) {
+		Integer pageNum = Integer.valueOf(pn);
+		Integer pageSize = Integer.valueOf(ps);
 		try {
 			Page<User> page = userService.selectAllUserPage(pageNum, pageSize);
 			return Result.success(page);

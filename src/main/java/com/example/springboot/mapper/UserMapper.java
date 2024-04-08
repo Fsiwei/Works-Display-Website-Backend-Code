@@ -20,7 +20,7 @@ public interface UserMapper {
 	void insert(User user);
 	
 	// 修改数据库数据
-	@Update("update `user` set username = #{username}, name = #{name}, phone = #{phone}, " +
+	@Update("update `user` set username = #{username}, gender = #{gender}, name = #{name}, phone = #{phone}, " +
 			"email = #{email}, address = #{address}, avatar = #{avatar} where id = #{id}")
 	void update(User user);
 	
