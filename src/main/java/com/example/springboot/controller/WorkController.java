@@ -201,4 +201,23 @@ public class WorkController {
 		}
 	}
 	
+	
+	@AuthAccess
+	@GetMapping("/selectAllWorkPage")
+	public Result selectAllWorkPage(@RequestParam String pn, @RequestParam String ps) {
+		Integer pageNum = Integer.valueOf(pn);
+		Integer pageSize = Integer.valueOf(ps);
+		try {
+			Page<Work> page = workService.selectAllWorkPage(pageNum, pageSize);
+			return Result.success(page);
+		} catch (Exception e) {
+			if (e instanceof DuplicateKeyException) {
+				return Result.error("获取用户数据错误");
+			} else {
+				return Result.error(e.getMessage());
+				// return Result.error("系统错误");
+			}
+		}
+	}
+	
 }

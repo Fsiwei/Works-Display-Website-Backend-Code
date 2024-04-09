@@ -56,4 +56,14 @@ public class WorkService {
 		page.setTotal(total);
 		return page;
 	}
+	
+	public Page<Work> selectAllWorkPage(Integer pageNum, Integer pageSize) {
+		Integer skipNum = (pageNum - 1) * pageSize;
+		Page<Work> page = new Page<>();
+		List<Work> workList = workMapper.selectAllWorkPage(skipNum, pageSize);
+		int total = workMapper.selectAllCountPage();
+		page.setList(workList);
+		page.setTotal(total);
+		return page;
+	}
 }

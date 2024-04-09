@@ -39,9 +39,15 @@ public interface WorkMapper {
 	@Update("update `work` set workLike = #{likeCount} where workId = #{workId}")
 	void updateLikeCount(@Param("workId") Integer workId, @Param("likeCount") Integer likeCount);
 	
-	@Select("select * from `work` inner join `user` on work.userId = user.id where workName like concat('%', #{keyword}, '%') and workDescribe like concat('%', #{keyword}, '%') and fileType = #{fileType} order by id desc limit #{skipNum}, #{pageSize}")
+	@Select("select * from `work` inner join `user` on work.userId = user.id where workName like concat('%', #{keyword}, '%') and workDescribe like concat('%', #{keyword}, '%') and fileType = #{fileType} order by workId desc limit #{skipNum}, #{pageSize}")
 	List<Work> selectWorkByKeywordPage(@Param("skipNum") Integer skipNum, @Param("pageSize") Integer pageSize, @Param("keyword") String keyword, @Param("fileType") String fileType);
 	
-	@Select("select count(id) from `work` where workName like concat('%', #{keyword}, '%') and workDescribe like concat('%', #{keyword}, '%') and fileType =#{fileType} order by id desc")
+	@Select("select count(id) from `work` where workName like concat('%', #{keyword}, '%') and workDescribe like concat('%', #{keyword}, '%') and fileType =#{fileType} order by workId desc")
 	int selectCountPage(@Param("keyword") String keyword, @Param("fileType") String fileType);
+	
+	@Select("select * from `work` inner join `user` on work.userId = user.id order by workId desc limit #{skipNum}, #{pageSize}")
+	List<Work> selectAllWorkPage(@Param("skipNum") Integer skipNum, @Param("pageSize") Integer pageSize);
+	
+	@Select("select count(workId) from `work` order by workId desc")
+	int selectAllCountPage();
 }

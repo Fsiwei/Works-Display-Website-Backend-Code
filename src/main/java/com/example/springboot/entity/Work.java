@@ -29,6 +29,7 @@ public class Work {
 	private Date uploadDate;
 	private String workUrls;
 	private String fileType;
+	private String status;
 	private Integer workLike;
 	private Integer workCollection;
 	private Integer comment;

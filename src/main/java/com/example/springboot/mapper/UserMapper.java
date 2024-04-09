@@ -30,7 +30,7 @@ public interface UserMapper {
 	@Update("update `user` set isActive = #{isActive} where id = #{userId}")
 	void updateUserIsActive(@Param("userId") Integer userId, @Param("isActive") Integer isActive);
 	
-	@Select("select * from `user` order by id desc limit #{skipNum}, #{pageSize}")
+	@Select("select * from `user` order by id asc limit #{skipNum}, #{pageSize}")
 	List<User> selectAllUserPage(@Param("skipNum") Integer skipNum, @Param("pageSize") Integer pageSize);
 	
 	@Select("select count(id) from `user` order by id desc")
