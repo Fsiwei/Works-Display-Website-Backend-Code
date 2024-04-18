@@ -23,30 +23,55 @@ public class WorkService {
 	@Autowired // 注入 Mapper
 	WorkMapper workMapper;
 	
+	/*
+	 * 添加作品
+	 * param: work
+	 */
 	public void insertWork(Work work) {
 		workMapper.insert(work);
 	}
 	
+	/*
+	 * 根据文件类型获取数据
+	 * param: fileType
+	 */
 	public List<Work> selectWorkByFileType(String fileType) {
 		return workMapper.selectWorkByFileType(fileType);
 	}
 	
+	/*
+	 * 根据用户ID和文件类型获取数据
+	 * param: userId
+	 * param: fileType
+	 */
 	public List<Work> selectByUserIdAndFileType(Integer userId, String fileType) {
 		return workMapper.selectByUserIdAndFileType(userId, fileType);
 	}
 	
+	/*
+	 * 根据作品ID获取数据
+	 * param: workId
+	 */
 	public Work selectByWorkId(Integer workId) {
 		return workMapper.selectByWorkId(workId);
 	}
 	
-	public List<Work> selectByKeywordImage(String keyword, String fileType) {
-		return workMapper.selectByKeywordImage(keyword, fileType);
+	/*
+	 * 根据关键词和文件类型获取数据
+	 * param: keyword
+	 * param: fileType
+	 */
+	public List<Work> selectByKeywordAndFileType(String keyword, String fileType) {
+		return workMapper.selectByKeywordAndFileType(keyword, fileType);
 	}
 	
-	public List<Work> selectByKeywordVideo(String keyword, String fileType) {
-		return workMapper.selectByKeywordVideo(keyword, fileType);
-	}
-	
+	/*
+	 * 根据关键词和文件类型分页查询
+	 * param: keyword
+	 * param: fileType
+	 * param: pageNum
+	 * param: pageSize
+	 */
 	public Page<Work> selectWorkByKeywordPage(Integer pageNum, Integer pageSize, String keyword, String fileType) {
 		Integer skipNum = (pageNum - 1) * pageSize;
 		Page<Work> page = new Page<>();
@@ -57,6 +82,13 @@ public class WorkService {
 		return page;
 	}
 	
+	/*
+	 * 分页查询所有作品数据
+	 * param: keyword
+	 * param: fileType
+	 * param: pageNum
+	 * param: pageSize
+	 */
 	public Page<Work> selectAllWorkPage(Integer pageNum, Integer pageSize) {
 		Integer skipNum = (pageNum - 1) * pageSize;
 		Page<Work> page = new Page<>();
@@ -65,5 +97,10 @@ public class WorkService {
 		page.setList(workList);
 		page.setTotal(total);
 		return page;
+	}
+
+	
+	public void updateWorkStatus(Integer workId, String status) {
+		workMapper.updateWorkStatus(workId, status);
 	}
 }

@@ -15,8 +15,8 @@ import java.util.List;
 public interface UserMapper {
 	
 	// 将数据插入数据库
-	@Insert("insert into `user` (username, password, name, phone, email, address, avatar)" +
-			"values (#{username}, #{password}, #{name}, #{phone}, #{email}, #{address}, #{avatar})")
+	@Insert("insert into `user` (username, password, name, phone, email, address, avatar, isActive)" +
+			"values (#{username}, #{password}, #{name}, #{phone}, #{email}, #{address}, #{avatar}, #{isActive)")
 	void insert(User user);
 	
 	// 修改数据库数据
@@ -45,14 +45,14 @@ public interface UserMapper {
 	@Select("select * from `user` where id = #{userId} order by id desc")
 	User selectById(int userId);
 	
-	@Select("select * from `user` where username = #{username} order by id desc")
+	@Select("select * from `user` where username = #{username} and isActive = 1 order by id desc")
 	User selectByUsername(String username);
 	
 	@Select("select * from `user` where username = #{username} and name = #{name} order by id desc")
 	List<User> selectByUsernameAndName(@Param("username") String username, @Param("name") String name);
 	
 	@Select("select * from `user` where username like concat('%', #{username}, '%') and name like concat('%', #{name}, '%') order by id desc")
-	// List<User> selectByUsernameAndNameLike(@Param("username") String username, @Param("name") String name);
+		// List<User> selectByUsernameAndNameLike(@Param("username") String username, @Param("name") String name);
 	List<User> selectByUsernameAndNameLike(@Param("username") String username, @Param("name") String name);
 	
 	// @Select("select * from `user` where username like concat('%', #{username}, '%') and name like concat('%', #{name}, '%') order by id desc limit #{skipNum}, #{pageSize}")

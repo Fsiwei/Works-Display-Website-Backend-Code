@@ -95,7 +95,7 @@ public class UserService {
 		// List<User> dbuser = userMapper.selectByUsername(user.getUsername());
 		if(dbUser == null){
 			// 抛出自定义异常
-			throw new ServiceException("用户名或密码错误");
+			throw new ServiceException("用户账号不可用");
 		}
 		if(!user.getPassword().equals(dbUser.getPassword())){
 			throw new ServiceException("用户名或密码错误");

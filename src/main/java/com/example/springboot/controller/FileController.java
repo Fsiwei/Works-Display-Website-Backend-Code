@@ -60,21 +60,6 @@ public class FileController {
         return Result.success(url); // 返回上传文件的链接，该链接是文件的下载地址，后端提供
     }
     
-    
-    // @AuthAccess
-    // @GetMapping("/download/{fileName}")
-    // public void download(@PathVariable String fileName, HttpServletResponse response) throws IOException { // 定义返回值类型 void，是因为要以文件流的形式输出
-    //     String filePath = ROOT_PATH + File.separator + fileName;
-    //     if(!FileUtil.exist(filePath)){ // 判断请求下载文件是否存在
-    //         return; // 不存在直接返回
-    //     }
-    //     byte[] bytes = FileUtil.readBytes(filePath); // 文件存在，读取文件的字节流
-    //     ServletOutputStream outputStream = response.getOutputStream();
-    //     outputStream.write(bytes); // 将文件写入，该方法参数是一个字节数组，即文件的字节流
-    //     outputStream.flush(); // 刷新
-    //     outputStream.close(); // 关闭，不关闭会占内存资源
-    // }
-    
     @AuthAccess
     @GetMapping("/download/{fileName}")
     public void download(@PathVariable String fileName, HttpServletResponse response) {

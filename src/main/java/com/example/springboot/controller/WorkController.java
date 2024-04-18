@@ -3,7 +3,11 @@ package com.example.springboot.controller;
 import com.example.springboot.common.AuthAccess;
 import com.example.springboot.common.Page;
 import com.example.springboot.common.Result;
+import com.example.springboot.entity.Message;
+import com.example.springboot.entity.Violation;
 import com.example.springboot.entity.Work;
+import com.example.springboot.service.MessageService;
+import com.example.springboot.service.ViolationService;
 import com.example.springboot.service.WorkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -14,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author : siwei.fan
@@ -27,6 +32,12 @@ public class WorkController {
 	
 	@Autowired
 	WorkService workService;
+	
+	@Autowired
+	MessageService messageService;
+	
+	@Autowired
+	ViolationService violationService;
 	
 	/**
 	 * 新增作品信息
@@ -42,6 +53,7 @@ public class WorkController {
 		String uploadDateString = (String) requestData.get("uploadDate");
 		String workUrls = (String) requestData.get("workUrls");
 		String fileType = (String) requestData.get("fileType");
+		String status = (String) requestData.get("status");
 		
 		// 将时间字符串转换为 Date 类型的对象
 		Date uploadDate = null;
@@ -59,7 +71,7 @@ public class WorkController {
 					.uploadDate(uploadDate)
 					.workUrls(workUrls)
 					.fileType(fileType)
-					// 其他属性...
+					.status(status)
 					.build();
 			workService.insertWork(work);
 		} catch (ParseException e) {
@@ -118,15 +130,15 @@ public class WorkController {
 	}
 	
 	/**
-	 * 通过关键词获取image作品
+	 * 通过关键词和文件类型获取作品
 	 */
 	@AuthAccess // 这个注释只在测试接口时使用
-	@GetMapping("/getWorkByKeywordImage")
-	public Result selectByKeywordImage(@RequestParam String keyword, @RequestParam String fileType) {
+	@GetMapping("/getWorkByKeywordAndFileType")
+	public Result selectByKeywordAndFileType(@RequestParam String keyword, @RequestParam String fileType) {
 		System.out.println("keyword:" + keyword);
 		System.out.println("fileType:" + fileType);
 		try {
-			List<Work> workList = workService.selectByKeywordImage(keyword, fileType);
+			List<Work> workList = workService.selectByKeywordAndFileType(keyword, fileType);
 			System.out.println(workList);
 			return Result.success(workList);
 		} catch (Exception e) {
@@ -139,27 +151,6 @@ public class WorkController {
 		}
 	}
 	
-	/**
-	 * 通过关键词获取video作品
-	 */
-	@AuthAccess // 这个注释只在测试接口时使用
-	@GetMapping("/getWorkByKeywordVideo")
-	public Result selectByKeywordVideo(@RequestParam String keyword, @RequestParam String fileType) {
-		System.out.println("keyword:" + keyword);
-		System.out.println("fileType:" + fileType);
-		try {
-			List<Work> workList = workService.selectByKeywordVideo(keyword, fileType);
-			System.out.println(workList);
-			return Result.success(workList);
-		} catch (Exception e) {
-			if (e instanceof DuplicateKeyException) {
-				return Result.error("获取作品数据错误");
-			} else {
-				System.out.println(e.getMessage());
-				return Result.error("系统错误");
-			}
-		}
-	}
 	
 	/**
 	 * 通过作品ID获取作品信息
@@ -187,13 +178,15 @@ public class WorkController {
 	 */
 	@AuthAccess
 	@GetMapping("/selectWorkByKeywordPage")
-	public Result selectWorkByKeywordPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize, String keyword, String fileType) {
+	public Result selectWorkByKeywordPage(@RequestParam Integer pn, @RequestParam Integer ps, String keyword, String fileType) {
+		Integer pageNum = Integer.valueOf(pn);
+		Integer pageSize = Integer.valueOf(ps);
 		try {
 			Page<Work> page = workService.selectWorkByKeywordPage(pageNum, pageSize, keyword, fileType);
 			return Result.success(page);
 		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
-				return Result.error("获取用户数据错误");
+				return Result.error("获取作品数据错误");
 			} else {
 				return Result.error(e.getMessage());
 				// return Result.error("系统错误");
@@ -212,12 +205,64 @@ public class WorkController {
 			return Result.success(page);
 		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
-				return Result.error("获取用户数据错误");
+				return Result.error("获取作品数据错误");
 			} else {
 				return Result.error(e.getMessage());
 				// return Result.error("系统错误");
 			}
 		}
+	}
+	
+	/**
+	 * 管理员审核后更改作品的状态
+	 * param: workId
+	 * param: status
+	 */
+	@PutMapping("/submitReviewWork")
+	public Result updateWorkStatus(@RequestBody Map<String, Object> requestData) {
+		Integer workId = (Integer) requestData.get("workId");
+		String status = (String) requestData.get("status");
+		Integer userId = (Integer) requestData.get("userId");
+		// 审核的数据
+		String content = (String) requestData.get("content");
+		String reviewDateString = (String) requestData.get("reviewDate");
+		// 违规记录的数据
+		String description = (String) requestData.get("description");
+		// 违规时间是审核时间？还是作品上传时间？
+		String violationDateString = (String) requestData.get("reviewDate");
+		// 将时间字符串转换为 Date 类型的对象
+		Date reviewDate = null;
+		Date violationDate = null;
+		try {
+			// 状态变更
+			workService.updateWorkStatus(workId, status);
+			// 添加审核记录，发送给用户的审核消息
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			reviewDate = dateFormat.parse(reviewDateString);
+			Message message = Message.builder()
+					.userId(userId)
+					.content(content)
+					.reviewDate(reviewDate)
+					.build();
+			messageService.insertMessage(message, workId, status);
+			// 判断审核后作品的状态是否是驳回，是则添加该用户的违规记录
+			if (Objects.equals(status, "驳回")) {
+				violationDate = dateFormat.parse(violationDateString);
+				Violation violation = Violation.builder()
+						.userId(userId)
+						.description(description)
+						.violationDate(violationDate)
+						.build();
+				violationService.insertViolation(violation);
+			}
+		} catch (Exception e) {
+			if (e instanceof DuplicateKeyException) {
+				return Result.error("更改作品状态失败");
+			} else {
+				return Result.error("系统错误");
+			}
+		}
+		return Result.success();
 	}
 	
 }

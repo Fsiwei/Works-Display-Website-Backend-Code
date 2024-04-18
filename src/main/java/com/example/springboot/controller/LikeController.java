@@ -40,23 +40,8 @@ public class LikeController {
 		Integer workId = (Integer) requestData.get("workId");
 		String workName = (String) requestData.get("workName");
 		String likeDateString = (String) requestData.get("likeDate");
-		Boolean flag = true;
 		// 将时间字符串转换为 Date 类型的对象
 		Date likeDate = null;
-		// System.out.println("like:" + like);
-		// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		// likeDate = dateFormat.parse(likeDateString);
-		// // 创建 Like 对象并设置属性
-		// Like like = Like.builder()
-		// 		.userId(userId)
-		// 		.userId(userId)
-		// 		.username(username)
-		// 		.avatar(avatar)
-		// 		.authorId(authorId)
-		// 		.workId(workId)
-		// 		.workName(workName)
-		// 		.likeDate(likeDate)
-		// 		.build();
 		Integer isLike = 1;
 		Integer count = 0;
 		try {
@@ -73,11 +58,6 @@ public class LikeController {
 					.workName(workName)
 					.likeDate(likeDate)
 					.build();
-			// flag = hasLikeByUserIdAndWorkId(workId, userId);
-			// if (!flag) {
-			// 	// 将 isLike 从 false 改为 true
-			// 	likeService.updateLikeByUserIdAndWorkId(userId, workId, isLike);
-			// }
 			count = likeService.countLikeByUserIdAndWorkId(like.getWorkId(), like.getUserId());
 			if (count > 0) {
 				// 更新
@@ -96,9 +76,6 @@ public class LikeController {
 			} else {
 				System.out.println(e.getMessage());
 				return Result.error("系统错误，内里" + e.getMessage());
-				// 此处没有相应查询记录时会返回空指针异常，其实没有该用户对该作品的点赞记录而已，没想到要如何处理，就先这样处理了
-				// likeService.insertLike(like);
-				// return Result.success(true);
 			}
 		}
 		return Result.success(true);

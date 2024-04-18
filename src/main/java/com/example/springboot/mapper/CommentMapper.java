@@ -21,16 +21,16 @@ public interface CommentMapper {
 			"values (#{userId}, #{authorId}, #{workId}, #{content}, #{commentDate})")
 	void insert(Comment comment);
 	
-	@Select("select count(*) as commentCount, workId from `comment` inner join `user` on comment.userId = user.id inner join `work` on comment.workId = work.workId where workId = #{workId} group by workId")
+	@Select("select count(*) as commentCount, workId from `comment` inner join `user` on comment.userId = user.id inner join `works` on comment.workId = works.workId where workId = #{workId} group by workId")
 	Integer getCommentCount(@Param("workId") Integer workId);
 	
-	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `work` on comment.workId = work.workId where workId = #{workId} order by commentId desc")
+	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `works` on comment.workId = works.workId where workId = #{workId} order by commentId desc")
 	List<Comment> selectCommentByWorkId(@Param("workId") Integer workId);
 	
-	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `work` on comment.workId = work.workId where authorId = #{authorId} order by commentId desc")
+	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `works` on comment.workId = works.workId where authorId = #{authorId} order by commentId desc")
 	List<Comment> selectCommentByAuthorId(@Param("authorId") Integer authorId);
 	
-	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `work` on comment.workId = work.workId where userId = #{userId} order by commentId desc")
+	@Select("select * from `comment` inner join `user` on comment.userId = user.id inner join `works` on comment.workId = works.workId where userId = #{userId} order by commentId desc")
 	List<Comment> selectCommentByUserId(@Param("userId") Integer userId);
 }
 
