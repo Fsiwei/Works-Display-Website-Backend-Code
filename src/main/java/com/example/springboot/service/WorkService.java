@@ -1,6 +1,7 @@
 package com.example.springboot.service;
 
 import com.example.springboot.common.Page;
+import com.example.springboot.entity.User;
 import com.example.springboot.entity.Work;
 import com.example.springboot.mapper.UserMapper;
 import com.example.springboot.mapper.WorkMapper;
@@ -44,8 +45,14 @@ public class WorkService {
 	 * param: userId
 	 * param: fileType
 	 */
-	public List<Work> selectByUserIdAndFileType(Integer userId, String fileType) {
-		return workMapper.selectByUserIdAndFileType(userId, fileType);
+	public Page<Work> selectByUserIdAndFileType(Integer pageNum, Integer pageSize, Integer userId, String fileType) {
+		Integer skipNum = (pageNum - 1) * pageSize;
+		Page<Work> page = new Page<>();
+		List<Work> workList = workMapper.selectByUserIdAndFileType(skipNum, pageSize, userId, fileType);
+		Integer total = workMapper.selectCountPageByUserIdAndFileType(userId, fileType);
+		page.setList(workList);
+		page.setTotal(total);
+		return page;
 	}
 	
 	/*
@@ -102,5 +109,9 @@ public class WorkService {
 	
 	public void updateWorkStatus(Integer workId, String status) {
 		workMapper.updateWorkStatus(workId, status);
+	}
+	
+	public Work selectWorksMostLike() {
+		return workMapper.selectWorksMostLike();
 	}
 }

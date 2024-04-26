@@ -34,11 +34,8 @@ public class LikeController {
 	@PostMapping("/releaseLike")
 	public Result releaseLike(@RequestBody Map<String, Object> requestData) throws java.text.ParseException {
 		Integer userId = (Integer) requestData.get("userId");
-		String username = (String) requestData.get("username");
-		String avatar = (String) requestData.get("avatar");
 		Integer authorId = (Integer) requestData.get("authorId");
 		Integer workId = (Integer) requestData.get("workId");
-		String workName = (String) requestData.get("workName");
 		String likeDateString = (String) requestData.get("likeDate");
 		// 将时间字符串转换为 Date 类型的对象
 		Date likeDate = null;
@@ -51,11 +48,8 @@ public class LikeController {
 			Like like = Like.builder()
 					.userId(userId)
 					.userId(userId)
-					.username(username)
-					.avatar(avatar)
 					.authorId(authorId)
 					.workId(workId)
-					.workName(workName)
 					.likeDate(likeDate)
 					.build();
 			count = likeService.countLikeByUserIdAndWorkId(like.getWorkId(), like.getUserId());

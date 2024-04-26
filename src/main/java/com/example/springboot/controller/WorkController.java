@@ -45,8 +45,6 @@ public class WorkController {
 	@PostMapping("/addWork")
 	public Result addWork(@RequestBody Map<String, Object> requestData) {
 		Integer userId = (Integer) requestData.get("userId");
-		String username = (String) requestData.get("username");
-		String avatar = (String) requestData.get("avatar");
 		String workName = (String) requestData.get("workName");
 		String workDescribe = (String) requestData.get("workDescribe");
 		String workType = (String) requestData.get("workType");
@@ -63,8 +61,6 @@ public class WorkController {
 			// 创建 Work 对象并设置属性
 			Work work = Work.builder()
 					.userId(userId)
-					.username(username)
-					.avatar(avatar)
 					.workName(workName)
 					.workDescribe(workDescribe)
 					.workType(workType)
@@ -114,10 +110,9 @@ public class WorkController {
 	 */
 	@AuthAccess // 这个注释只在测试接口时使用
 	@GetMapping("/getWorkByUserIdAndFileType")
-	public Result selectByUserId(@RequestParam String id, @RequestParam String fileType) {
-		Integer userId = Integer.valueOf(id);
+	public Result selectByUserId(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam Integer userId, @RequestParam String fileType) {
 		try {
-			List<Work> workList = workService.selectByUserIdAndFileType(userId, fileType);
+			Page<Work> workList = workService.selectByUserIdAndFileType(pageNum, pageSize, userId, fileType);
 			return Result.success(workList);
 		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
@@ -135,8 +130,6 @@ public class WorkController {
 	@AuthAccess // 这个注释只在测试接口时使用
 	@GetMapping("/getWorkByKeywordAndFileType")
 	public Result selectByKeywordAndFileType(@RequestParam String keyword, @RequestParam String fileType) {
-		System.out.println("keyword:" + keyword);
-		System.out.println("fileType:" + fileType);
 		try {
 			List<Work> workList = workService.selectByKeywordAndFileType(keyword, fileType);
 			System.out.println(workList);
@@ -157,8 +150,7 @@ public class WorkController {
 	 */
 	@AuthAccess
 	@GetMapping("/getWorkByWorkId")
-	public Result getWorkByWorkId(@RequestParam String id) {
-		Integer workId = Integer.valueOf(id);
+	public Result getWorkByWorkId(@RequestParam Integer workId) {
 		try {
 			Work work = workService.selectByWorkId(workId);
 			return Result.success(work);
@@ -178,9 +170,8 @@ public class WorkController {
 	 */
 	@AuthAccess
 	@GetMapping("/selectWorkByKeywordPage")
-	public Result selectWorkByKeywordPage(@RequestParam Integer pn, @RequestParam Integer ps, String keyword, String fileType) {
-		Integer pageNum = Integer.valueOf(pn);
-		Integer pageSize = Integer.valueOf(ps);
+	public Result selectWorkByKeywordPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize, @RequestParam String keyword, @RequestParam String fileType) {
+		System.out.println("fileType" +fileType);
 		try {
 			Page<Work> page = workService.selectWorkByKeywordPage(pageNum, pageSize, keyword, fileType);
 			return Result.success(page);
@@ -197,9 +188,7 @@ public class WorkController {
 	
 	@AuthAccess
 	@GetMapping("/selectAllWorkPage")
-	public Result selectAllWorkPage(@RequestParam String pn, @RequestParam String ps) {
-		Integer pageNum = Integer.valueOf(pn);
-		Integer pageSize = Integer.valueOf(ps);
+	public Result selectAllWorkPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize) {
 		try {
 			Page<Work> page = workService.selectAllWorkPage(pageNum, pageSize);
 			return Result.success(page);
@@ -218,23 +207,18 @@ public class WorkController {
 	 * param: workId
 	 * param: status
 	 */
-	@PutMapping("/submitReviewWork")
+	@PostMapping("/submitReviewWork")
 	public Result updateWorkStatus(@RequestBody Map<String, Object> requestData) {
 		Integer workId = (Integer) requestData.get("workId");
 		String status = (String) requestData.get("status");
 		Integer userId = (Integer) requestData.get("userId");
-		// 审核的数据
+		String workName = (String) requestData.get("workName");
 		String content = (String) requestData.get("content");
 		String reviewDateString = (String) requestData.get("reviewDate");
-		// 违规记录的数据
-		String description = (String) requestData.get("description");
-		// 违规时间是审核时间？还是作品上传时间？
-		String violationDateString = (String) requestData.get("reviewDate");
-		// 将时间字符串转换为 Date 类型的对象
 		Date reviewDate = null;
 		Date violationDate = null;
+		System.out.println("数据" + workId + status + userId + workName + content + reviewDateString);
 		try {
-			// 状态变更
 			workService.updateWorkStatus(workId, status);
 			// 添加审核记录，发送给用户的审核消息
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -247,9 +231,11 @@ public class WorkController {
 			messageService.insertMessage(message, workId, status);
 			// 判断审核后作品的状态是否是驳回，是则添加该用户的违规记录
 			if (Objects.equals(status, "驳回")) {
-				violationDate = dateFormat.parse(violationDateString);
+				String description = "具体违规内容：" + content + "。";
+				violationDate = dateFormat.parse(reviewDateString);
 				Violation violation = Violation.builder()
 						.userId(userId)
+						.workName(workName)
 						.description(description)
 						.violationDate(violationDate)
 						.build();
@@ -263,6 +249,21 @@ public class WorkController {
 			}
 		}
 		return Result.success();
+	}
+	
+	@GetMapping("/getWorksMostLike")
+	public Result getWorksMostLike() {
+		try {
+			Work work = workService.selectWorksMostLike();
+			return Result.success(work);
+		} catch (Exception e) {
+			if(e instanceof DuplicateKeyException) {
+				return Result.error("获取作品信息失败");
+			} else {
+				System.out.println(e.getMessage());
+				return Result.error("系统错误");
+			}
+		}
 	}
 	
 }

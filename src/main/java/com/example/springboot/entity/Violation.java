@@ -21,6 +21,7 @@ import java.util.Date;
 @RestController
 public class Violation {
 	private Integer userId;
+	private String workName;
 	private String description;
 	private Date violationDate;
 }

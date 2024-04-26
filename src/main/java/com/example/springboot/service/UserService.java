@@ -34,12 +34,12 @@ public class UserService {
 		userMapper.update(user);
 	}
 	
-	public void updateUserIsActive(Integer userId, Integer isActive) {
+	public void updateUserIsActive(Integer userId, Boolean isActive) {
 		userMapper.updateUserIsActive(userId, isActive);
 	}
 	
-	public User selectByUserId(Integer userId) {
-		return userMapper.selectByUserId(userId);
+	public User getUserInfo(Integer userId) {
+		return userMapper.selectUserInfo(userId);
 	}
 	
 	public void deleteUser(Integer id) {
@@ -47,7 +47,7 @@ public class UserService {
 	}
 	
 	public void batchDeleteUser(List<Integer> ids) {
-		for(Integer id : ids){
+		for (Integer id : ids) {
 			userMapper.delete(id);
 		}
 	}
@@ -93,11 +93,11 @@ public class UserService {
 		// 根据用户名查询数据库的用户信息
 		User dbUser = userMapper.selectByUsername(user.getUsername());
 		// List<User> dbuser = userMapper.selectByUsername(user.getUsername());
-		if(dbUser == null){
+		if (dbUser == null) {
 			// 抛出自定义异常
 			throw new ServiceException("用户账号不可用");
 		}
-		if(!user.getPassword().equals(dbUser.getPassword())){
+		if (!user.getPassword().equals(dbUser.getPassword())) {
 			throw new ServiceException("用户名或密码错误");
 		}
 		// 生成 token
@@ -109,12 +109,11 @@ public class UserService {
 	public User register(User user) {
 		// 注册前前判断该用户名是否已经存在
 		User dbUser = userMapper.selectByUsername(user.getUsername());
-		if(dbUser != null){
+		if (dbUser != null) {
 			// 抛出自定义异常
 			throw new ServiceException("用户名已存在");
 		}
 		userMapper.insert(user);
 		return user;
 	}
-	
 }

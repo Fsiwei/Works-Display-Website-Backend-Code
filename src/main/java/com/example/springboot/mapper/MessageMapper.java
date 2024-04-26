@@ -18,6 +18,6 @@ public interface MessageMapper {
 	@Insert("insert into `message` (userId, content, date) values (#{userId}, #{content}, #{reviewDate})")
 	void insert(Message message);
 	
-	@Select("select * from `message` inner join `user` on message.userId = user.id where userId = #{authorId} order by commentId desc")
+	@Select("select * from `message` inner join `user` on message.userId = user.id where userId = #{authorId} order by messageId desc")
 	List<Message> selectMessageByAuthorId(Integer authorId);
 }

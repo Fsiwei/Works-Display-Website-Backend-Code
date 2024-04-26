@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author : siwei.fan
  * @date : 2024/4/17 21:58
@@ -21,5 +23,9 @@ public class ViolationService {
 	
 	public void insertViolation(Violation violation){
 		violationMapper.insert(violation);
+	}
+	
+	public List<Violation> getUserViolationRecord(Integer userId) {
+		return violationMapper.selectUserViolationRecord(userId);
 	}
 }

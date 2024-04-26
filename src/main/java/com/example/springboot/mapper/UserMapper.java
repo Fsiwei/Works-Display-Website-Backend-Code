@@ -20,15 +20,15 @@ public interface UserMapper {
 	void insert(User user);
 	
 	// 修改数据库数据
-	@Update("update `user` set username = #{username}, gender = #{gender}, name = #{name}, phone = #{phone}, " +
+	@Update("update `user` set gender = #{gender}, phone = #{phone}, " +
 			"email = #{email}, address = #{address}, avatar = #{avatar} where id = #{id}")
 	void update(User user);
 	
 	@Select("select * from `user` where id = #{userId} order by id desc")
-	User selectByUserId(@Param("userId") Integer userId);
+	User selectUserInfo(@Param("userId") Integer userId);
 	
 	@Update("update `user` set isActive = #{isActive} where id = #{userId}")
-	void updateUserIsActive(@Param("userId") Integer userId, @Param("isActive") Integer isActive);
+	void updateUserIsActive(@Param("userId") Integer userId, @Param("isActive") Boolean isActive);
 	
 	@Select("select * from `user` order by id asc limit #{skipNum}, #{pageSize}")
 	List<User> selectAllUserPage(@Param("skipNum") Integer skipNum, @Param("pageSize") Integer pageSize);
@@ -37,16 +37,16 @@ public interface UserMapper {
 	int selectCountPage();
 	
 	@Delete("delete from `user` where id = #{id}")
-	void delete(Integer id);
+	void delete(@Param("userId") Integer id);
 	
 	@Select("select * from `user` order by id desc")
 	List<User> selectAllUser();
 	
 	@Select("select * from `user` where id = #{userId} order by id desc")
-	User selectById(int userId);
+	User selectById(@Param("userId") Integer userId);
 	
 	@Select("select * from `user` where username = #{username} and isActive = 1 order by id desc")
-	User selectByUsername(String username);
+	User selectByUsername(@Param("username") String username);
 	
 	@Select("select * from `user` where username = #{username} and name = #{name} order by id desc")
 	List<User> selectByUsernameAndName(@Param("username") String username, @Param("name") String name);

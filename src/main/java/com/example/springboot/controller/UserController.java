@@ -118,11 +118,10 @@ public class UserController {
 	 * 通过用户ID查询用户信息
 	 */
 	@AuthAccess // 这个注释只在测试接口时使用
-	@GetMapping("/selectByUserId")
-	public Result selectByUserId(@RequestParam String uid) {
-		Integer userId = Integer.valueOf(uid);
+	@GetMapping("/getUserInfo")
+	public Result getUserInfo(@RequestParam Integer userId) {
 		try {
-			User user = userService.selectByUserId(userId);
+			User user = userService.getUserInfo(userId);
 			return Result.success(user);
 		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
@@ -136,12 +135,10 @@ public class UserController {
 	/**
 	 * 修改用户信息
 	 */
-	@PutMapping("/updateUserInfo")
+	@PostMapping("/updateUserInfo")
 	public Result updateUserInfo(@RequestBody Map<String, Object> requestData) {
 		Integer userId = (Integer) requestData.get("userId");
-		String username = (String) requestData.get("username");
 		String gender = (String) requestData.get("gender");
-		String name = (String) requestData.get("name");
 		String phone = (String) requestData.get("phone");
 		String email = (String) requestData.get("email");
 		String address = (String) requestData.get("address");
@@ -151,9 +148,7 @@ public class UserController {
 			// 创建 Work 对象并设置属性
 			User user = User.builder()
 					.id(userId)
-					.username(username)
 					.gender(gender)
-					.name(name)
 					.phone(phone)
 					.email(email)
 					.address(address)
@@ -164,8 +159,7 @@ public class UserController {
 			// 处理解析异常
 			e.printStackTrace();
 			return Result.error("系统错误!!");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
 				return Result.error("用户数据更新失败");
 			} else {
@@ -177,18 +171,23 @@ public class UserController {
 	}
 	
 	/**
-	 * 根据用户ID修改用户是否可用
+	 * 禁用用户账号
+	 * param: userId
+	 * param: isActive
 	 */
-	@PutMapping("/updateUserIsActive")
-	public Result updateUserIsActive(@RequestBody Map<String, Object> requestData) {
-		Integer userId = (Integer) requestData.get("userId");
-		Integer isActive = (Integer) requestData.get("isActive");
+	@PostMapping("/updateUserIsActive")
+	public Result updateUserIsActive(@RequestBody User user) {
+		Integer userId = user.getId();
+		Boolean isActive = user.getIsActive();
+		System.out.println("userId: " + user.getId());
+		System.out.println("isActive: " + user.getIsActive());
 		try {
-			userService.updateUserIsActive(userId, isActive);
+			userService.updateUserIsActive(userId, !isActive);
 		} catch (Exception e) {
 			if (e instanceof DuplicateKeyException) {
 				return Result.error("修改用户是否可用失败");
 			} else {
+				System.out.println(e.getMessage());
 				return Result.error("系统错误");
 			}
 		}
@@ -199,9 +198,7 @@ public class UserController {
 	 * 多条件分页模糊查询
 	 */
 	@GetMapping("/selectAllUserPage")
-	public Result selectAllUserPage(@RequestParam String pn, @RequestParam String ps) {
-		Integer pageNum = Integer.valueOf(pn);
-		Integer pageSize = Integer.valueOf(ps);
+	public Result selectAllUserPage(@RequestParam Integer pageNum, @RequestParam Integer pageSize) {
 		try {
 			Page<User> page = userService.selectAllUserPage(pageNum, pageSize);
 			return Result.success(page);

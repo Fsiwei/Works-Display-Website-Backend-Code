@@ -3,6 +3,10 @@ package com.example.springboot.mapper;
 import com.example.springboot.entity.Violation;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author : siwei.fan
@@ -13,6 +17,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ViolationMapper {
 	
-	@Insert("insert into `violationrecord` (userId, description, violation_date) values (#{userId}, #{description}, #{violationDate})")
+	@Insert("insert into `violationrecord` (userId, description, violationDate, workName) values (#{userId}, #{description}, #{violationDate}, #{workName})")
 	void insert(Violation violation);
+	
+	@Select("select * from `violationRecord` where userId = #{userId} order by id")
+	List<Violation> selectUserViolationRecord(@Param("userId") Integer userId);
 }
